@@ -4,6 +4,7 @@ import numpy as np
 import csv
 import joblib
 from collections import deque, Counter
+from performanceEvalualtion import RepRecorder, PerformanceEvaluator
 
 clf = joblib.load('exercise_classifier.pkl')
 PREDICTION_WINDOW = 15  # Number of frames to consider
@@ -153,6 +154,10 @@ def analyze_exercise(video_path):
     # initialize our counter class
     counter = ExerciseCounter()
 
+    # stores feature sequences
+    recorder   = RepRecorder()          
+    evaluator  = None
+
     with mp_pose.Pose(
         min_detection_confidence=0.7,
         min_tracking_confidence=0.7
@@ -180,6 +185,10 @@ def analyze_exercise(video_path):
                 locked_exercise = None
                 if count > PREDICTION_WINDOW // 2:
                     locked_exercise = best
+                    if evaluator is None:                     
+                        evaluator = PerformanceEvaluator(
+                            exercise_type=locked_exercise
+                        )
                 # Use locked_exercise for all further processing
                 if locked_exercise:
                     # Set upper and lower thresholds for each exercise
@@ -206,8 +215,20 @@ def analyze_exercise(video_path):
 
                     # get the angles for the Rep counter
                     angle = process_joints(results.pose_landmarks.landmark, locked_exercise)
+
+                    feature_vec = extract_features(results.pose_landmarks.landmark)
+                    recorder.update(feature_vec, counter.state)
                     
                     count, feedback = counter.update(angle, down_thresh, up_thresh)
+                    if counter.state == "up" and recorder.sequences:
+                        this_rep = recorder.sequences.pop(0)
+                        if evaluator:                         # safety check
+                            score = evaluator.evaluate(this_rep)
+                            print(f"Rep {count}: {score:.1f}")
+                            # cv2.putText(image, f"Score: {score:.1f}",
+                            #             (10, 110), cv2.FONT_HERSHEY_SIMPLEX,
+                            #             0.7, (255,255,255), 2)
+
                     # update cv2 Texts
                     cv2.putText(image, f"Reps: {count}", (10, 30),
                                 cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), 2)
