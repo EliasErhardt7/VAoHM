@@ -93,7 +93,7 @@ class PerformanceEvaluator:
     ``alpha`` to your own data.
     """
 
-    def __init__(self, exercise_type: str, template_dir: str | Path = "templates", *, alpha: float = 0.05):
+    def __init__(self, exercise_type: str, template_dir: str | Path = "templates", *, alpha: float = 0.01):
         self.exercise = exercise_type
         self.template = self._load_template(template_dir, exercise_type)
         self.alpha = alpha

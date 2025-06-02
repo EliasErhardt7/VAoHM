@@ -72,23 +72,20 @@ def save_features_from_video(video_path, label, output_csv):
 
 # runs the script
 if __name__ == "__main__":
-
-    video = "C:/Users/Elias/Documents/GitHub/VAoHM/videos/situp.mp4"
-    #locked_exercise = "situp"  # or "squat" or "situp"
     output_csv = "features.csv"
 
     # Pushup videos
     save_features_from_video("C:/Users/Elias/Documents/GitHub/VAoHM/videos/pushup.mp4", "pushup", output_csv)
-    save_features_from_video("C:/Users/Elias/Documents/GitHub/VAoHM/videos/Push-Ups_Train.mp4", "pushup", output_csv)
+    #save_features_from_video("C:/Users/Elias/Documents/GitHub/VAoHM/videos/Push-Ups_Train.mp4", "pushup", output_csv)
     #save_features_from_video("pushup2.mp4", "pushup", output_csv)
 
     # Squat videos
     save_features_from_video("C:/Users/Elias/Documents/GitHub/VAoHM/videos/squat.mp4", "squat", output_csv) 
+    #save_features_from_video("C:/Users/Elias/Documents/GitHub/VAoHM/videos/Squat_Train.mp4", "squat", output_csv) 
     #save_features_from_video("squat2.mp4", "squat", output_csv)
 
     # Situp videos
-    save_features_from_video("C:/Users/Elias/Documents/GitHub/VAoHM/videos/situp.mp4", "situp", output_csv)
-    save_features_from_video("C:/Users/Elias/Documents/GitHub/VAoHM/videos/Sit-Ups_Train1.mp4", "situp", output_csv) 
+    #save_features_from_video("C:/Users/Elias/Documents/GitHub/VAoHM/videos/Sit-Ups_Train1.mp4", "situp", output_csv) 
     save_features_from_video("C:/Users/Elias/Documents/GitHub/VAoHM/videos/Sit-Ups_Train2.mp4", "situp", output_csv)
     #save_features_from_video("situp2.mp4", "situp", output_csv)
 

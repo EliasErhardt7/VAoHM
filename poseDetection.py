@@ -193,11 +193,11 @@ def analyze_exercise(video_path):
                 if locked_exercise:
                     # Set upper and lower thresholds for each exercise
                     if locked_exercise == "pushup":
-                        down_thresh, up_thresh = 90, 160
+                        down_thresh, up_thresh = 90, 140
                     elif locked_exercise == "situp":
-                        down_thresh, up_thresh = 40, 80
+                        down_thresh, up_thresh = 60, 90
                     elif locked_exercise == "squat":
-                        down_thresh, up_thresh = 110, 160
+                        down_thresh, up_thresh = 100, 160
                     else:
                         down_thresh, up_thresh = 90, 160
                     cv2.putText(
@@ -230,7 +230,7 @@ def analyze_exercise(video_path):
                             #             0.7, (255,255,255), 2)
 
                     # update cv2 Texts
-                    cv2.putText(image, f"Reps: {count}", (10, 30),
+                    cv2.putText(image, f"Reps: {count}", (10, 130),
                                 cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), 2)
                     cv2.putText(image, feedback, (10, 70),
                                 cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255,255,255), 2)
@@ -307,13 +307,6 @@ def process_joints(landmarks, exercise_type):
     else:
         return None
 
-'''
-# not used
-def count_reps(current_angle, lower_thresh, upper_thresh):
-    counter = ExerciseCounter()
-    count = counter.update(current_angle, lower_thresh, upper_thresh)
-    return count, "Good form" if 50 < current_angle < 160 else "Adjust form"
-'''
 
 # MAIN CLASSIFIER FOR REPETITIONS FOR SPECIFIC EXERCISE END ------------------------------------------------------
 
@@ -344,6 +337,6 @@ class ExerciseCounter:
 # runs the script
 if __name__ == "__main__":
 
-    video = "C:/Users/Elias/Documents/GitHub/VAoHM/videos/pushup.mp4"
+    video = "C:/Users/Elias/Documents/GitHub/VAoHM/videos/Sit-Ups_Train2.mp4"
     #locked_exercise = "situp"  # or "squat" or "situp"
     analyze_exercise(video)
