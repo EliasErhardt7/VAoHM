@@ -7,13 +7,13 @@ from typing import List
 import numpy as np
 
 try:
-    from fastdtw import fastdtw  # type: ignore
-    from scipy.spatial.distance import euclidean  # type: ignore
+    from fastdtw import fastdtw  
+    from scipy.spatial.distance import euclidean  
 
     _HAS_FDTW = True
-except ImportError:  # graceful degradation
+except ImportError: 
 
-    def fastdtw(a, b, dist):  # fall‑back using NumPy only (slow!)
+    def fastdtw(a, b, dist):  
         from math import inf
 
         n, m = len(a), len(b)
@@ -25,25 +25,12 @@ except ImportError:  # graceful degradation
                 dtw[i, j] = cost + min(dtw[i - 1, j], dtw[i, j - 1], dtw[i - 1, j - 1])
         return dtw[n, m], None
 
-    from numpy.linalg import norm as euclidean  # type: ignore
-
+    from numpy.linalg import norm as euclidean 
     _HAS_FDTW = False
-
     
 # 1.  Per‑repetition sequence recording                                       
 
-
 class RepRecorder:
-    """Accumulate per‑frame feature vectors and segment them into
-    individual repetitions using the *state* signal from
-    ``ExerciseCounter``.
-
-    Parameters
-    ----------
-    history : int, optional
-        How many frames to keep in memory for the *current* repetition
-        (helps avoid unbounded RAM use on extremely long videos).
-    """
 
     def __init__(self, history: int = 1024):
         self._current: List[np.ndarray] = []
@@ -53,7 +40,6 @@ class RepRecorder:
 
     def update(self, feature_vec: np.ndarray, state: str | None) -> None:
         if state == "down":
-            # New repetition starts → (re‑)initialise buffer
             if not self._in_rep:
                 self._current = []
                 self._in_rep = True
@@ -61,7 +47,6 @@ class RepRecorder:
         elif state == "up":
             if self._in_rep:
                 self._append(feature_vec)
-                # Repetition finished → store and clear
                 self.sequences.append(self._current)
                 self._current = []
                 self._in_rep = False
@@ -71,36 +56,26 @@ class RepRecorder:
 
 
     def pop_last(self) -> List[np.ndarray] | None:
-        """Return the most recently finished repetition (or ``None``)."""
         return self.sequences.pop() if self.sequences else None
 
 
     def _append(self, vec: np.ndarray) -> None:
         self._current.append(vec)
         if len(self._current) > self._history:
-            self._current.pop(0)  # softly constrain memory
-
+            self._current.pop(0) 
 
 # 2.  Comparing a repetition against the ideal template                      
 
-
 class PerformanceEvaluator:
-    """Compares a repetition to a *template* and returns a 0‑100 quality
-    score (100 = perfect match).
 
-    The default transformation from DTW distance → score works
-    reasonably across different movement speeds but you *should* tune
-    ``alpha`` to your own data.
-    """
-
-    def __init__(self, exercise_type: str, template_dir: str | Path = "templates", *, alpha: float = 0.01):
+    def __init__(self, exercise_type: str, template_dir: str | Path = "templates", *, alpha: float = 0.003):
         self.exercise = exercise_type
         self.template = self._load_template(template_dir, exercise_type)
         self.alpha = alpha
 
     def evaluate(self, seq: List[np.ndarray] | np.ndarray) -> float:
         if seq is None or len(seq) == 0:
-            return 0.0  # malformed input → worst score
+            return 0.0 
         rep = np.asarray(seq, dtype=float)
         dist, _ = fastdtw(rep, self.template, dist=euclidean)
         norm_dist = dist / len(self.template)
@@ -121,21 +96,12 @@ class PerformanceEvaluator:
                 f"Template file '{path}' not found. Generate it with save_template(...) first!")
         return np.load(path)
 
-
 # 3.  Helper:  quick template extractor from a single ideal video         
 
-
 def extract_template_from_video(video_path: str | os.PathLike, exercise: str, *,
-                                feature_extractor,  # callable(frame_landmarks) -> np.ndarray
+                                feature_extractor, 
                                 down_thresh: float, up_thresh: float,
                                 template_dir: str | Path = "templates") -> None:
-    """Run pose estimation on *video_path* and save the first repetition as
-    the template for *exercise*.
-
-    The ``feature_extractor`` is the same function you already use in
-    poseDetection.py (it should return the 3‑dimensional feature vector
-    [mean_elbow_angle, mean_knee_angle, mean_hip_angle]).
-    """
     import cv2
     import mediapipe as mp
 
@@ -145,7 +111,7 @@ def extract_template_from_video(video_path: str | os.PathLike, exercise: str, *,
     cap = cv2.VideoCapture(str(video_path))
     state = None
     rep = []
-    queues = deque(maxlen=5)  # quick smoothing of raw state changes
+    queues = deque(maxlen=5) 
 
     with mp_pose.Pose(min_detection_confidence=0.7, min_tracking_confidence=0.7) as pose:
         while cap.isOpened():
@@ -157,7 +123,6 @@ def extract_template_from_video(video_path: str | os.PathLike, exercise: str, *,
             if not results.pose_landmarks:
                 continue
             feats = feature_extractor(results.pose_landmarks.landmark)
-            # Determine current phase from knee/hip/elbow angle
             angle_primary = feats[0] if exercise == "pushup" else feats[1] if exercise == "squat" else feats[2]
             current_state = "down" if angle_primary < down_thresh else "up" if angle_primary > up_thresh else "move"
             queues.append(current_state)
@@ -165,7 +130,6 @@ def extract_template_from_video(video_path: str | os.PathLike, exercise: str, *,
             if majority_state == "down":
                 rep.append(feats)
             elif majority_state == "up" and rep:
-                # repetition finished ‑ save and break (use first rep only)
                 PerformanceEvaluator.save_template(rep, exercise, template_dir)
                 break
     cap.release()

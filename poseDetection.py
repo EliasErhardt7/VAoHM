@@ -162,6 +162,10 @@ def analyze_exercise(video_path):
         min_detection_confidence=0.7,
         min_tracking_confidence=0.7
     ) as pose:
+        last_score = None
+        frames_remaining = 0 
+        display_frames = 45 
+
         while cap.isOpened():
             ret, frame = cap.read()
             if not ret:
@@ -222,21 +226,31 @@ def analyze_exercise(video_path):
                     count, feedback = counter.update(angle, down_thresh, up_thresh)
                     if counter.state == "up" and recorder.sequences:
                         this_rep = recorder.sequences.pop(0)
-                        if evaluator:                         # safety check
+                        if evaluator:                        
                             score = evaluator.evaluate(this_rep)
                             print(f"Rep {count}: {score:.1f}")
-                            # cv2.putText(image, f"Score: {score:.1f}",
-                            #             (10, 110), cv2.FONT_HERSHEY_SIMPLEX,
-                            #             0.7, (255,255,255), 2)
+                            last_score = score
+                            frames_remaining = display_frames
 
-                    # update cv2 Texts
+                            if last_score >= 90 :
+                                colour = (0,255,0)
+                            else : (0,255,255) 
+
+                            if last_score >= 75 :
+                                colour = (0,255,0)
+                            else : (0,0,255)
+
+                            if frames_remaining > 0 and last_score is not None:
+                                cv2.putText(image, f"Score: {last_score:.1f}", (10, 110),
+                                            cv2.FONT_HERSHEY_SIMPLEX, 0.8, colour, 2)
+                                frames_remaining -= 1
+
                     cv2.putText(image, f"Reps: {count}", (10, 130),
                                 cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), 2)
                     cv2.putText(image, feedback, (10, 70),
                                 cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255,255,255), 2)
                 else:
                     feedback = "Detecting exercise..."
-                    # update cv2 Texts
                     cv2.putText(image, feedback, (10, 70),
                                 cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255,255,255), 2)
 
