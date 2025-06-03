@@ -349,6 +349,6 @@ class ExerciseCounter:
 # runs the script
 if __name__ == "__main__":
 
-    video = "C:/Users/Elias/Documents/GitHub/VAoHM/videos/Squat_Train.mp4"
+    video = "C:/Users/Elias/Documents/GitHub/VAoHM/videos/Sit-Ups_Train2.mp4"
     #locked_exercise = "situp"  # or "squat" or "situp"
     analyze_exercise(video)
