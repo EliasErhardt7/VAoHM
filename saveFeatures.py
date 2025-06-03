@@ -81,12 +81,13 @@ if __name__ == "__main__":
 
     # Squat videos
     save_features_from_video("C:/Users/Elias/Documents/GitHub/VAoHM/videos/squat.mp4", "squat", output_csv) 
-    #save_features_from_video("C:/Users/Elias/Documents/GitHub/VAoHM/videos/Squat_Train.mp4", "squat", output_csv) 
+    save_features_from_video("C:/Users/Elias/Documents/GitHub/VAoHM/videos/Squat_Train3.mp4", "squat", output_csv)
+    save_features_from_video("C:/Users/Elias/Documents/GitHub/VAoHM/videos/Squat_Train2.mp4", "squat", output_csv) 
     #save_features_from_video("squat2.mp4", "squat", output_csv)
 
     # Situp videos
     #save_features_from_video("C:/Users/Elias/Documents/GitHub/VAoHM/videos/Sit-Ups_Train1.mp4", "situp", output_csv) 
-    save_features_from_video("C:/Users/Elias/Documents/GitHub/VAoHM/videos/Sit-Ups_Train2.mp4", "situp", output_csv)
+    save_features_from_video("C:/Users/Elias/Documents/GitHub/VAoHM/videos/Sit-Ups_Train3.mp4", "situp", output_csv)
     #save_features_from_video("situp2.mp4", "situp", output_csv)
 
     #analyze_exercise(video)

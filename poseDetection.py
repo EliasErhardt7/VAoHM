@@ -163,8 +163,7 @@ def analyze_exercise(video_path):
         min_tracking_confidence=0.7
     ) as pose:
         last_score = None
-        frames_remaining = 0 
-        display_frames = 45 
+        frames_remaining = 50 
 
         while cap.isOpened():
             ret, frame = cap.read()
@@ -207,7 +206,7 @@ def analyze_exercise(video_path):
                     cv2.putText(
                         image,                     
                         f"Exercise: {locked_exercise.capitalize()}",
-                        (670, 50),                    
+                        (680, 40),                    
                         cv2.FONT_HERSHEY_SIMPLEX,   
                         0.8,                       
                         (255, 255, 255),             
@@ -230,24 +229,23 @@ def analyze_exercise(video_path):
                             score = evaluator.evaluate(this_rep)
                             print(f"Rep {count}: {score:.1f}")
                             last_score = score
-                            frames_remaining = display_frames
-
-                            if last_score >= 90 :
-                                colour = (0,255,0)
-                            else : (0,255,255) 
+                            frames_remaining = 50 
 
                             if last_score >= 75 :
                                 colour = (0,255,0)
-                            else : (0,0,255)
+                            elif last_score >= 50 and last_score < 75 :
+                                colour = (0,255,255)
+                            else : colour = (0,0,255)
 
-                            if frames_remaining > 0 and last_score is not None:
-                                cv2.putText(image, f"Score: {last_score:.1f}", (10, 110),
-                                            cv2.FONT_HERSHEY_SIMPLEX, 0.8, colour, 2)
+                    if frames_remaining > 0 and last_score is not None:
+                                cv2.putText(image, f"Score: {last_score:.1f}", (10, 190),
+                                            cv2.FONT_HERSHEY_SIMPLEX, 0.7, colour, 2)
                                 frames_remaining -= 1
+                    
 
-                    cv2.putText(image, f"Reps: {count}", (10, 130),
+                    cv2.putText(image, f"Reps: {count}", (10, 230),
                                 cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), 2)
-                    cv2.putText(image, feedback, (10, 70),
+                    cv2.putText(image, feedback, (10, 150),
                                 cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255,255,255), 2)
                 else:
                     feedback = "Detecting exercise..."
@@ -351,6 +349,6 @@ class ExerciseCounter:
 # runs the script
 if __name__ == "__main__":
 
-    video = "C:/Users/Elias/Documents/GitHub/VAoHM/videos/Sit-Ups_Train2.mp4"
+    video = "C:/Users/Elias/Documents/GitHub/VAoHM/videos/Squat_Train.mp4"
     #locked_exercise = "situp"  # or "squat" or "situp"
     analyze_exercise(video)
